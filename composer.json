@@ -1,0 +1,44 @@
+{
+    "name": "tinybeans/easy-form",
+    "description": "You can make a contact form easily. Just submit a form, and an email will be sent.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "easy form"
+    ],
+    "support": {
+        "docs": "https://github.com/tinybeans/easy-form/blob/master/README.md",
+        "issues": "https://github.com/tinybeans/easy-form/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Roy Okuwaki",
+            "homepage": "https://tinbyeans.net"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "tinybeans\\easyform\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Easy Form",
+        "handle": "easy-form",
+        "developer": "Roy Okuwaki",
+        "developerUrl": "https://tinbyeans.net",
+        "documentationUrl": "https://github.com/tinybeans/easy-form/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/tinybeans/easy-form/master/CHANGELOG.md",
+        "components": {
+            "easyform": "tinybeans\\easyform\\services\\Easyform"
+        },
+        "class": "tinybeans\\easyform\\EasyForm"
+    }
+}
