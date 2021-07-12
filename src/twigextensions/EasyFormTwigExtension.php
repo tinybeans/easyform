@@ -68,13 +68,24 @@ class EasyFormTwigExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
+            new TwigFunction('easyFormAttributes', [$this, 'easyFormAttributes'], ['is_safe' => ['html']]),
             new TwigFunction('easyFormHiddenInput', [$this, 'easyFormHiddenInput'], ['is_safe' => ['html']]),
             new TwigFunction('easyFormPreventBotScript', [$this, 'easyFormPreventBotScript'], ['is_safe' => ['html']]),
         ];
     }
 
     /**
-     * Our function called via Twig; it can do anything you want
+     * Output a form attributes for Easy Form
+     *
+     * @return string
+     */
+    public function easyFormAttributes()
+    {
+        return 'method="post" accept-charset="UTF-8" enctype="multipart/form-data" data-easyform';
+    }
+
+    /**
+     * Output hidden input tags for Easy Form
      *
      * @return string
      */
