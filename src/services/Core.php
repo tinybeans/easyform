@@ -241,6 +241,47 @@ class Core extends Component
         ];
     }
 
+    /**
+     * Send an Email
+     *
+     * @param array $settings 'to', 'replyTo', 'subject', 'template', 'format'
+     * @param array $params
+     * @return array
+     */
+    public function sendEmail($settings = [], $params = [])
+    {
+        $app = Craft::$app;
+        $request = $app->request;
+        $systemSettings = $app->projectConfig->get('email');
+
+        $message = new Message();
+        // From
+        $message->setFrom([$systemSettings['fromEmail'] => $systemSettings['fromName']]);
+        // To
+        $message->setTo($settings['to']);
+        // Cc
+        if (isset($settings['cc'])) {
+            $message->setCc($settings['cc']);
+        }
+        // Reply to
+        if (empty($settings['replyTo'])) {
+            $message->setReplyTo($systemSettings['fromEmail']);
+        }
+        else {
+            $message->setReplyTo($settings['replyTo']);
+        }
+        // Subject
+        $message->setSubject($settings['subject']);
+        // Email body
+        $emailBody = $app->getView()->renderTemplate($settings['template'], $params);
+        if ($settings['format'] === 'text') {
+            $message->setTextBody($emailBody);
+        }
+        else {
+            $message->setHtmlBody($emailBody);
+        }
+        return $app->mailer->send($message);
+    }
 
     /**
      * Print custom logs
