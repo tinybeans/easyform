@@ -209,7 +209,7 @@ class Core extends Component
                 $messageToAdmin->setTextBody($emailBody);
             }
             else {
-                $messageToCustomer->setHtmlBody($emailBody);
+                $messageToAdmin->setHtmlBody($emailBody);
             }
             if (!$resultCustomer = $app->mailer->send($messageToAdmin)) {
                 return [
