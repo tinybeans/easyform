@@ -39,7 +39,7 @@ class EasyFormTwigExtension extends AbstractExtension
      *
      * @return string The extension name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'EasyForm';
     }
@@ -51,7 +51,7 @@ class EasyFormTwigExtension extends AbstractExtension
      *
      * @return array
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('someFilter', [$this, 'someInternalFunction']),
@@ -65,7 +65,7 @@ class EasyFormTwigExtension extends AbstractExtension
      *
     * @return array
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('easyFormAttributes', [$this, 'easyFormAttributes'], ['is_safe' => ['html']]),
@@ -79,7 +79,7 @@ class EasyFormTwigExtension extends AbstractExtension
      *
      * @return string
      */
-    public function easyFormAttributes()
+    public function easyFormAttributes(): string
     {
         return 'method="post" accept-charset="UTF-8" enctype="multipart/form-data" data-easyform';
     }
@@ -89,12 +89,12 @@ class EasyFormTwigExtension extends AbstractExtension
      *
      * @return string
      */
-    public function easyFormHiddenInput()
+    public function easyFormHiddenInput(): string
     {
         return 
             '<input type="hidden" name="focus">' .
             '<input type="hidden" name="keyup">' .
-            '<input type="email" name="email" class="d-none">';
+            '<input type="email" name="email" data-easyform-hidden>';
     }
 
     /**
@@ -102,7 +102,7 @@ class EasyFormTwigExtension extends AbstractExtension
      *
      * @return string
      */
-    public function easyFormPreventBotScript()
+    public function easyFormPreventBotScript(): string
     {
         $language = Craft::$app->getSites()->getCurrentSite()->language;
         $alertMessage = 'You might have typed only a few characters. Please type more, otherwise, you may be judged as a bot.';

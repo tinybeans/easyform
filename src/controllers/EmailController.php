@@ -14,6 +14,9 @@ use tinybeans\easyform\EasyForm;
 
 use Craft;
 use craft\web\Controller;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
+use yii\web\Response;
 
 /**
  * Email Controller
@@ -46,7 +49,7 @@ class EmailController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index', 'do-something'];
+    protected array|bool|int $allowAnonymous = ['index', 'test'];
 
     // Public Methods
     // =========================================================================
@@ -56,26 +59,43 @@ class EmailController extends Controller
      * e.g.: actions/easy-form/email
      *
      * @return mixed
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
-    public function actionIndex()
+    public function actionIndex(): Response
     {
         $response = EasyForm::$plugin->core->contactForm();
         if (isset($response['success'])) {
-            return Craft::$app->getResponse()->redirect(Craft::$app->getSecurity()->validateData($response['redirect']))->send();
+            return $this->redirect(Craft::$app->getSecurity()->validateData($response['redirect']));
         }
-        return Craft::$app->getResponse()->redirect($response['redirect'])->send();
+        return $this->redirect($response['redirect']);
     }
 
     /**
      * Handle a request going to our plugin's actionDoSomething URL,
-     * e.g.: actions/easy-form/email/do-something
+     * e.g.: actions/easy-form/email/test
      *
      * @return mixed
      */
-    public function actionDoSomething()
+    public function actionTest()
     {
-        $result = 'Welcome to the EmailController actionDoSomething() method';
+        $settings = EasyForm::$plugin->getSettings();
+        $currentUser = Craft::$app->getUser()->getIdentity();
+        $toEmail = $currentUser->email;
+        $result = EasyForm::$plugin->core->sendEmail([
+            'to' => $toEmail,
+            'replyTo' => $toEmail,
+            'subject' => 'Easy Form Test',
+            'template' => '_emails/easy-form-test.twig',
+            'format' => 'text',
+        ], [
+            'toEmail' => $toEmail,
+            'settings' => $settings,
+        ]);
 
-        return $result;
+        return json_encode($result);
     }
 }
