@@ -35,7 +35,7 @@ use yii\base\Event;
  *
  * @author    Roy Okuwaki
  * @package   EasyForm
- * @since     1.0.0
+ * @since     2.0.0
  *
  * @property  CoreService $core
  * @property  Settings $settings
@@ -62,21 +62,21 @@ class EasyForm extends Plugin
      *
      * @var string
      */
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '2.0.0';
 
     /**
      * Set to `true` if the plugin should have a settings view in the control panel.
      *
      * @var bool
      */
-    public $hasCpSettings = true;
+    public bool $hasCpSettings = true;
 
     /**
      * Set to `true` if the plugin should have its own section (main nav item) in the control panel.
      *
      * @var bool
      */
-    public $hasCpSection = false;
+    public bool $hasCpSection = false;
 
     // Public Methods
     // =========================================================================
@@ -92,7 +92,7 @@ class EasyForm extends Plugin
      * you do not need to load it in your init() method.
      *
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         self::$plugin = $this;
@@ -168,7 +168,7 @@ class EasyForm extends Plugin
      *
      * @return \craft\base\Model|null
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): \craft\base\Model
     {
         return new Settings();
     }

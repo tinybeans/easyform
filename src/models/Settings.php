@@ -34,8 +34,8 @@ class Settings extends Model
     // Public Properties
     // =========================================================================
     
-    public $forms = [];
-    public $allowEmptyEmail = false;
+    public array $forms = [];
+    public bool $allowEmptyEmail = false;
 
     // Public Methods
     // =========================================================================
@@ -50,7 +50,7 @@ class Settings extends Model
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             ['forms', 'array'],

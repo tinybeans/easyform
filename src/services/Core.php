@@ -15,6 +15,11 @@ use tinybeans\easyform\EasyForm;
 use Craft;
 use craft\base\Component;
 use craft\mail\Message;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 
 
 /**
@@ -43,9 +48,14 @@ class Core extends Component
      *
      *     EasyForm::$plugin->core->contactForm()
      *
-     * @return mixed
+     * @return array
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws Exception
+     * @throws InvalidConfigException
      */
-    public function contactForm()
+    public function contactForm(): array
     {
         $app = Craft::$app;
         $request = $app->request;
@@ -69,7 +79,6 @@ class Core extends Component
                 'redirect' => $parseUrl['path'] . '?noSettings=1'
             ];
         }
-        $settings = (array)$settings;
         $currentSettings = $settings[$formHandle];
         if (empty($currentSettings)) {
             return [
@@ -153,6 +162,8 @@ class Core extends Component
                 // Subject
                 $messageToCustomer->setSubject($toCustomerSettings['subject']);
                 // Email body
+                $params['toAdmin'] = false;
+                $params['toCustomer'] = true;
                 $emailBody = $app->getView()->renderTemplate($toCustomerSettings['template'], $params);
                 if ($toCustomerSettings['format'] === 'text') {
                     $messageToCustomer->setTextBody($emailBody);
@@ -160,7 +171,7 @@ class Core extends Component
                 else {
                     $messageToCustomer->setHtmlBody($emailBody);
                 }
-                if (!$resultCustomer = $app->mailer->send($messageToCustomer)) {
+                if (!$app->mailer->send($messageToCustomer)) {
                     return [
                         'error' => [
                             'code' => 500,
@@ -204,6 +215,8 @@ class Core extends Component
             // Subject
             $messageToAdmin->setSubject($toAdminSettings['subject']);
             // Email body
+            $params['toAdmin'] = true;
+            $params['toCustomer'] = false;
             $emailBody = $app->getView()->renderTemplate($toAdminSettings['template'], $params);
             if ($toAdminSettings['format'] === 'text') {
                 $messageToAdmin->setTextBody($emailBody);
@@ -211,7 +224,7 @@ class Core extends Component
             else {
                 $messageToAdmin->setHtmlBody($emailBody);
             }
-            if (!$resultCustomer = $app->mailer->send($messageToAdmin)) {
+            if (!$app->mailer->send($messageToAdmin)) {
                 return [
                     'error' => [
                         'code' => 500,

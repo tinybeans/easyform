@@ -6,7 +6,7 @@ You can make a contact form easily. Just submit a form, and an email will be sen
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 3.0.0 or later.
 
 ## Installation
 
