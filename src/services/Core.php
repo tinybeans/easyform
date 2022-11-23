@@ -15,6 +15,7 @@ use tinybeans\easyform\EasyForm;
 use Craft;
 use craft\base\Component;
 use craft\mail\Message;
+use craft\helpers\App;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -109,7 +110,7 @@ class Core extends Component
                 'redirect' => $parseUrl['path'] . '?toEmailMissing=1'
             ];
         }
-        
+
         // =========================================================================
         // Block spam
         // =========================================================================
@@ -143,20 +144,21 @@ class Core extends Component
         // Send an email
         // =========================================================================
         $systemSettings = $app->projectConfig->get('email');
+        $fromEmail = $this->getEnvValue($systemSettings['fromEmail']);
+        $fromName = $this->getEnvValue($systemSettings['fromName']);
 
         // To Customer
         if (!empty($toEmail) && empty($currentSettings['allowEmptyEmail'])) {
             if ($toCustomerSettings = $currentSettings['toCustomer']) {
                 $messageToCustomer = new Message();
                 // From
-                $messageToCustomer->setFrom([$systemSettings['fromEmail'] => $systemSettings['fromName']]);
+                $messageToCustomer->setFrom([$fromEmail => $fromName]);
                 // To
                 $messageToCustomer->setTo($toEmail);
                 // Reply to
                 if (empty($toCustomerSettings['replyTo'])) {
-                    $messageToCustomer->setReplyTo($systemSettings['fromEmail']);
-                }
-                else {
+                    $messageToCustomer->setReplyTo($fromEmail);
+                } else {
                     $messageToCustomer->setReplyTo($toCustomerSettings['replyTo']);
                 }
                 // Subject
@@ -167,8 +169,7 @@ class Core extends Component
                 $emailBody = $app->getView()->renderTemplate($toCustomerSettings['template'], $params);
                 if ($toCustomerSettings['format'] === 'text') {
                     $messageToCustomer->setTextBody($emailBody);
-                }
-                else {
+                } else {
                     $messageToCustomer->setHtmlBody($emailBody);
                 }
                 if (!$app->mailer->send($messageToCustomer)) {
@@ -180,8 +181,7 @@ class Core extends Component
                         'redirect' => $parseUrl['path'] . '?emailFailed=1'
                     ];
                 }
-            }
-            else {
+            } else {
                 return [
                     'error' => [
                         'code' => 500,
@@ -191,17 +191,16 @@ class Core extends Component
                 ];
             }
         }
-        
+
         // To Admin
         if ($toAdminSettings = $currentSettings['toAdmin']) {
             $messageToAdmin = new Message();
             // From
-            $messageToAdmin->setFrom([$systemSettings['fromEmail'] => $systemSettings['fromName']]);
+            $messageToAdmin->setFrom([$fromEmail => $fromName]);
             // To
             if (empty($toAdminSettings['to'])) {
-                $messageToAdmin->setTo($systemSettings['fromEmail']);
-            }
-            else {
+                $messageToAdmin->setTo($fromEmail);
+            } else {
                 $messageToAdmin->setTo($toAdminSettings['to']);
             }
             // Cc
@@ -220,8 +219,7 @@ class Core extends Component
             $emailBody = $app->getView()->renderTemplate($toAdminSettings['template'], $params);
             if ($toAdminSettings['format'] === 'text') {
                 $messageToAdmin->setTextBody($emailBody);
-            }
-            else {
+            } else {
                 $messageToAdmin->setHtmlBody($emailBody);
             }
             if (!$app->mailer->send($messageToAdmin)) {
@@ -233,8 +231,7 @@ class Core extends Component
                     'redirect' => $parseUrl['path'] . '?emailFailed=1'
                 ];
             }
-        }
-        else {
+        } else {
             return [
                 'error' => [
                     'code' => 500,
@@ -266,10 +263,12 @@ class Core extends Component
         $app = Craft::$app;
         $request = $app->request;
         $systemSettings = $app->projectConfig->get('email');
+        $fromEmail = $this->getEnvValue($systemSettings['fromEmail']);
+        $fromName = $this->getEnvValue($systemSettings['fromName']);
 
         $message = new Message();
         // From
-        $message->setFrom([$systemSettings['fromEmail'] => $systemSettings['fromName']]);
+        $message->setFrom([$fromEmail => $fromName]);
         // To
         $message->setTo($settings['to']);
         // Cc
@@ -278,9 +277,8 @@ class Core extends Component
         }
         // Reply to
         if (empty($settings['replyTo'])) {
-            $message->setReplyTo($systemSettings['fromEmail']);
-        }
-        else {
+            $message->setReplyTo($fromEmail);
+        } else {
             $message->setReplyTo($settings['replyTo']);
         }
         // Subject
@@ -289,11 +287,23 @@ class Core extends Component
         $emailBody = $app->getView()->renderTemplate($settings['template'], $params);
         if ($settings['format'] === 'text') {
             $message->setTextBody($emailBody);
-        }
-        else {
+        } else {
             $message->setHtmlBody($emailBody);
         }
         return $app->mailer->send($message);
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function getEnvValue($name)
+    {
+        if (preg_match('/^\$/', $name)) {
+            $name = preg_replace('/^\$/u', '', $name);
+            return App::env($name);
+        }
+        return $name;
     }
 
     /**
